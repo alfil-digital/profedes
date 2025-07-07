@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+  <!-- Flujo de Trabajo: Cuando un usuario accede a la raíz de la aplicación (por ejemplo, tudominio.com), index.html es típicamente el primer archivo servido por el servidor web. Su único propósito es redirigir inmediatamente el navegador a index.php. Esta es una práctica común para asegurar que todas las solicitudes iniciales pasen por el punto de entrada de la aplicación PHP, donde se puede manejar la gestión de sesiones y otra lógica del lado del servidor -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="0; url=index.php" />
+    <title>Redireccionando...</title>
+  </head>
+
+  <body>
+    <p>
+      Si no eres redirigido automáticamente,
+      <a href="index.php">haz clic aquí</a>.
+    </p>
+  </body>
+</html>

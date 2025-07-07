@@ -1,0 +1,113 @@
+body {
+    background-color: #ffffff;
+    font-family:"Times New Roman", Times, serif;
+    text-decoration: none;
+    font-size: 12px;
+    margin: 0px auto;
+    text-align: center;
+}
+h2{
+    font-size: 20px;
+}
+h3{
+    font-size: 18px;
+}
+h4{
+    font-size: 14px;
+}
+.encabezado {
+    font-size: 10px;    
+} 
+
+.p_caratula {
+    font-size: 18px;
+} 
+p {
+    text-align: left;
+    margin: 10px;
+}
+table {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:16pt;
+    border: 1px single #ffffff;
+}
+td {
+    font:Verdana, Arial, Helvetica, sans-serif;
+    font-size:9pt;
+    border: 1px single #ffffff;
+} 
+
+th {
+    font:Verdana, Arial, Helvetica, sans-serif;
+    font-size:11pt;
+}
+
+table.renglones {
+
+    margin: 10px;
+    text-align: left;
+    border-collapse: collapse;
+    border: #000000 1px solid;
+}
+.renglones td, .renglones th {
+    font-size: 12px;
+    padding: 5px;
+    border: #000000 1px solid;
+   
+}
+p.renglones {
+    text-align: justify;
+    font-size: 10px;
+}
+
+
+table.renglones_11 {
+
+    margin: 10px;
+    text-align: left;
+    border-collapse: collapse;
+    border: #000000 1px solid;
+}
+.renglones_11 td, .renglones_11 th {
+    font-size: 11px;
+    padding: 5px;
+    border: #000000 1px solid;
+   
+}
+p.renglones_11 {
+    text-align: justify;
+    font-size: 11px;
+}
+
+
+table.anio_homenaje {
+    margin: 10px;
+    text-align: left;
+    border-collapse: collapse;
+    border: #000000 0px solid;
+}
+.anio_homenaje tr, .anio_homenaje td, .anio_homenaje th {
+    font-size: 10px;
+    font-style: italic;
+    padding: 5px;
+    border: #000000 0px solid;
+    vertical-align: top;
+}
+ 
+.p_anulado{
+color: #DC3545;
+}
+
+table.borde {
+
+    margin: 10px;
+    text-align: left;
+    border-collapse: collapse;
+    border: #000000 1px solid;
+}
+.borde tr, .borde td, .borde th {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    padding: 5px;
+    border: #000000 1px solid;   
+}

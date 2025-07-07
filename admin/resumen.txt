@@ -1,0 +1,149 @@
+
+Resumen del Flujo de Trabajo del Sistema
+Esta aplicación sigue un modelo de aplicación web tradicional con carga de módulos PHP y una fuerte interacción mediante AJAX (jQuery) para funcionalidades específicas como el cambio de contraseña.
+
+1. Acceso Inicial a la Aplicación (Usuario no logueado)
+
+Paso: El usuario ingresa la URL principal de la aplicación (ej. midominio.com).
+Proceso:
+Servidor: Recibe la solicitud para midominio.com/.
+Servidor: Por configuración (ej. Apache/Nginx), sirve index.html.
+
+Cliente (Navegador): Carga index.html.
+Cliente (Navegador): El meta tag http-equiv="refresh" en index.html detecta la redirección.
+Cliente (Navegador): Inicia una redirección interna a index.php.
+
+Servidor: Recibe la solicitud para index.php.
+Servidor (PHP): Ejecuta index.php.
+Servidor (PHP): index.php detecta que $_SESSION['userid'] no está establecido.
+Servidor (PHP): Imprime un script <script>document.location='login.php';</script>.
+
+Cliente (Navegador): Ejecuta el script y redirige a login.php.
+
+Servidor: Recibe la solicitud para login.php.
+Servidor (PHP): Ejecuta login.php.
+Servidor (PHP): Inicia la sesión (session_start()), incluye env.php y conexion.php, y establece la conexión a la BD.
+Servidor (PHP): Genera el HTML completo del formulario de login.
+Servidor: Envía el HTML al cliente.
+
+Tiempos de Ejecución (Estimado):
+Redirecciones iniciales (index.html -> index.php -> login.php): Muy rápidos, casi instantáneos, generalmente < 50ms cada una, dependiendo de la latencia de red.
+Carga y Renderizado de login.php: 100ms - 500ms (dependiendo del tamaño de los archivos CSS/JS, la velocidad de la BD y la complejidad de la lógica PHP).
+2. Inicio de Sesión
+
+Paso: El usuario ingresa credenciales en login.php y hace clic en "Login".
+Proceso:
+Cliente (Navegador): Envía el formulario login mediante POST a login.php.
+Servidor (PHP): login.php recibe la solicitud POST.
+Servidor (PHP): Obtiene user y password de $_POST.
+Servidor (PHP): Sanea el nombre de usuario (mysqli_real_escape_string).
+Servidor (PHP): Ejecuta una consulta SQL para validar las credenciales.
+Servidor (PHP): Si las credenciales son válidas, verifica la contraseña hasheada (password_verify()).
+Servidor (PHP): Si todo es correcto, establece las variables de sesión ($_SESSION['userid'], etc.).
+Servidor (PHP): Control de Contraseña Predeterminada:
+Si la contraseña es la predeterminada (usuario = contraseña), el PHP imprime <script>cambiar_clave_pass();</script>.
+Si no es la predeterminada, el PHP imprime <script>document.location='index.php';</script>.
+Servidor (PHP): Envía la respuesta HTML/scripts al cliente.
+Cliente (Navegador): Ejecuta el script recibido.
+Si es cambiar_clave_pass(): La función JS realiza una llamada AJAX GET a modulos/administracion/cambiar_clave/formulario.php. El contenido HTML se carga en el #popup y se muestra.
+Si es document.location='index.php': El navegador redirige a index.php.
+Tiempos de Ejecución (Estimado):
+Envío del formulario y procesamiento PHP: 100ms - 400ms (principalmente tiempo de consulta a la BD y procesamiento de la lógica de autenticación).
+Redirección/AJAX para cambio de contraseña: < 100ms adicional (si se redirige) o 100-300ms adicional (si se carga el formulario AJAX, incluyendo la nueva solicitud GET).
+3. Carga del Dashboard Principal (index.php)
+
+Paso: El usuario es redirigido a index.php (después de un login exitoso o si ya estaba logueado).
+Proceso:
+Servidor (PHP): index.php recibe la solicitud.
+Servidor (PHP): Inicia la sesión, incluye env.php y conexion.php, conecta a la BD.
+Servidor (PHP): Verifica $_SESSION['userid'] (usuario logueado).
+Servidor (PHP): Incluye menu.php, header.php y footer.php (contenido estático y basado en sesión).
+menu.php ejecuta consultas SQL para construir el menú dinámico basado en $_SESSION['grupo_id'].
+header.php muestra información del usuario desde la sesión.
+Servidor (PHP): Carga de Módulo Principal:
+Verifica si $_GET['pagina'] está establecido.
+Decodifica pagina (base64).
+Realiza una consulta SQL para verificar los permisos del usuario para ese módulo.
+Si tiene permisos, incluye el archivo PHP del módulo (ej. modulos/administracion/usuarios.php).
+Imprime JavaScript para resaltar el menú y expandir las secciones correspondientes en la barra lateral (jQuery).
+Si no tiene permisos, incluye 403.php.
+Servidor: Envía el HTML completo (con el módulo cargado) y los scripts al cliente.
+Cliente (Navegador): Carga y renderiza la página.
+Cliente (Navegador): Ejecuta scripts JavaScript (jQuery, Bootstrap, jquery-confirm, DataTables) para inicializar interactividad y el resaltado del menú.
+Tiempos de Ejecución (Estimado):
+Procesamiento PHP (incluyendo múltiples consultas a BD para menú y permisos): 200ms - 800ms.
+Carga y Renderizado completo de la página: 500ms - 1500ms (dependiendo de la complejidad del módulo cargado, cantidad de datos si usa DataTables, y la cantidad de archivos JS/CSS).
+4. Interacción con Módulos (Ej. Clic en un elemento del menú)
+
+Paso: El usuario hace clic en un elemento del submenú en la barra lateral.
+Proceso:
+Cliente (Navegador): El onClick del enlace ejecuta window.location='index.php?pagina=...&op=...'.
+Cliente (Navegador): El navegador realiza una recarga completa de la página a index.php con los nuevos parámetros GET.
+Servidor (PHP): Se repite el proceso de "Carga del Dashboard Principal (index.php)" (punto 3), pero esta vez se incluirá el módulo correspondiente a la nueva $_GET['pagina'].
+Servidor (PHP): El JavaScript generado para resaltar el menú asegurará que el nuevo elemento esté activo.
+Tiempos de Ejecución (Estimado): Idénticos a la "Carga del Dashboard Principal" (500ms - 1500ms), ya que es una recarga completa de la página.
+5. Cambio de Contraseña (a través del modal)
+
+Paso: El usuario hace clic en "Cambiar Contraseña" en el menú de usuario.
+Proceso:
+Cliente (Navegador): Se ejecuta la función cambiar_clave_pass().
+Cliente (Navegador - jQuery AJAX): Envía una solicitud AJAX GET a modulos/administracion/cambiar_clave/formulario.php.
+Servidor (PHP): formulario.php genera el HTML del formulario de cambio de contraseña.
+Servidor: Envía el HTML de vuelta al cliente.
+Cliente (Navegador - jQuery): La función cambiar_clave_pass() recibe el HTML, lo inserta en #popup y lo muestra (fadeIn).
+Paso: El usuario completa el formulario y hace clic en "Guardar".
+Proceso:
+Cliente (Navegador - JavaScript): Se ejecuta validar_pass() para la validación del lado del cliente.
+Cliente (Navegador - JavaScript): Si la validación es exitosa, se ejecuta controlar_pass().
+Cliente (Navegador - jQuery AJAX): Envía una solicitud AJAX POST a modulos/administracion/cambiar_clave/controlador.php, serializando los datos del formulario.
+Servidor (PHP): controlador.php recibe la solicitud POST.
+Servidor (PHP): Procesa los datos (valida, hashea la nueva contraseña, actualiza la BD).
+Servidor (PHP): Envía una respuesta (ej. "Contraseña actualizada" o un mensaje de error).
+Cliente (Navegador - jQuery): La función controlar_pass() recibe la respuesta, la inserta en #mensaje y la muestra.
+Tiempos de Ejecución (Estimado):
+Carga del formulario AJAX: 100ms - 300ms (tiempo de solicitud GET + procesamiento PHP de formulario.php + renderizado básico del popup).
+Envío del formulario AJAX: 150ms - 400ms (tiempo de solicitud POST + procesamiento PHP de controlador.php + actualización de BD).
+6. Cierre de Sesión
+
+Paso: El usuario hace clic en "Salir" y confirma en el modal.
+Proceso:
+Cliente (Navegador): El clic en "Cerrar sesión" en el modal redirige directamente a logout.php.
+Servidor (PHP): logout.php recibe la solicitud.
+Servidor (PHP): Inicia la sesión.
+Servidor (PHP): Destruye la sesión (session_destroy()).
+Servidor (PHP): Envía una redirección HTTP a index.php (header('location:index.php');).
+Cliente (Navegador): Recibe la redirección a index.php.
+Cliente (Navegador): Se repite el proceso de "Acceso Inicial a la Aplicación" (punto 1), redirigiendo al usuario de vuelta a login.php.
+Tiempos de Ejecución (Estimado): Muy rápido, típicamente < 100ms (procesamiento PHP muy ligero + redirección).
+Consideraciones Generales sobre Tiempos de Ejecución:
+
+Latencia de Red: Es un factor dominante en cualquier aplicación web. La distancia entre el usuario y el servidor, la calidad de la conexión, etc., afectan significativamente los tiempos.
+Carga del Servidor: Un servidor con muchos usuarios o procesos pesados responderá más lentamente.
+Rendimiento de la Base de Datos: Las consultas SQL (especialmente si no están bien optimizadas o hay mucha carga en la BD) pueden ser un cuello de botella.
+Tamaño de los Recursos (CSS/JS/Imágenes): Archivos grandes o muchos archivos pequeños aumentarán el tiempo de carga inicial. La caché del navegador ayuda con esto en visitas posteriores.
+Optimización del Código: Un código PHP eficiente y JavaScript optimizado mejorarán los tiempos.
+Uso de CDN: Para librerías o activos estáticos, un CDN puede reducir los tiempos de carga al servirlos desde ubicaciones más cercanas al usuario.
+En general, la aplicación parece diseñada para ser reactiva, utilizando recargas completas de página para la navegación entre módulos (que es un enfoque común para aplicaciones PHP basadas en plantilla) y AJAX para interacciones "in-situ" que no requieren una recarga completa (como el cambio de contraseña).
+
+
+Resumen del uso de jQuery y AJAX:
+jQuery se utiliza extensamente para:
+
+Manipulación del DOM: Seleccionar elementos por ID (#popup, #mensaje, #formulario), agregar/quitar clases (addClass, removeClass), desvanecer elementos para que aparezcan/desaparezcan (fadeIn, fadeOut).
+Manejo de Eventos: Adjuntar manejadores onclick (por ejemplo, cambiar_clave_pass()).
+Serialización de Formularios: Convertir fácilmente los datos del formulario en una cadena codificada para URL para envíos AJAX ($("#formulario").serialize()).
+AJAX (Asynchronous JavaScript and XML) se utiliza para:
+
+Carga Dinámica de Contenido (Formulario de Cambio de Contraseña):
+Dónde: En login.php e index.php, la función cambiar_clave_pass() utiliza $.get("modulos/administracion/cambiar_clave/formulario.php", ...).
+Por qué: Para cargar el formulario de "cambio de contraseña" en una ventana emergente sin recargar toda la página, proporcionando una experiencia de usuario más fluida.
+Cómo: Se envía una solicitud GET a formulario.php. El servidor procesa esta solicitud (probablemente generando HTML para el formulario), y el dato (la respuesta HTML) se inyecta luego en el div #popup.
+Envío de Formularios (Control de Cambio de Contraseña):
+Dónde: En login.php e index.php, la función controlar_pass() utiliza $.post("modulos/administracion/cambiar_clave/controlador.php", $("#formulario").serialize(), ...).
+Por qué: Para enviar los nuevos datos de la contraseña al servidor para su procesamiento sin recargar toda la página. Esto permite una retroalimentación inmediata al usuario (por ejemplo, "Contraseña cambiada con éxito" o "Error") sin interrumpir su vista actual.
+Cómo: Se envía una solicitud POST a controlador.php con los datos del formulario serializados. El servidor procesa el cambio de contraseña (por ejemplo, actualiza la base de datos), y el dato (la respuesta del servidor, a menudo un mensaje de éxito/error) se inyecta luego en el div #mensaje.
+Paso de Funciones:
+
+De HTML onclick a JavaScript: Las funciones como cambiar_clave_pass() se invocan directamente desde elementos HTML usando onclick="nombreDeLaFuncion();".
+De PHP echo a JavaScript: En login.php e index.php, se utiliza echo "<script>nombreDeLaFuncion();</script>" de PHP para ejecutar funciones JavaScript después del procesamiento del lado del servidor, típicamente para redireccionamientos o para mostrar ventanas emergentes iniciales.
+Callbacks de jQuery: En las llamadas AJAX ($.get(), $.post()), el segundo argumento es una función de callback (function(dato) { ... }). Esta función se ejecuta cuando la solicitud AJAX se completa con éxito y el servidor devuelve una respuesta. El parámetro dato en este callback contiene los datos devueltos por el servidor.
