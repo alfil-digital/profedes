@@ -74,12 +74,6 @@ if (isset($_GET['id']) && $_GET['id'] != 0) {
     </div>
   </div>
 
-  <div class="col-md-12 position-relative">
-    <label for="observaciones" class="form-label">Observaciones</label>
-    <textarea class="form-control" id="observaciones" name="observaciones"
-      rows="3"><?php echo isset($row['observaciones']) ? $row['observaciones'] : ''; ?></textarea>
-  </div>
-
 </form>
 <div class="mt-4" align="center">
   <button type="submit" class="btn btn-primary" onclick="guardar()">Guardar</button>

@@ -30,6 +30,7 @@ CREATE TABLE opciones (
 
 -- Insertar Opciones (Menús Principales)
 INSERT INTO opciones (titulo,descripcion,icono,orden,estado,usuario_abm) VALUES ('Tablas Maestras','Administrar','fas fa-cog',1,1,'admin');
+INSERT INTO opciones (titulo,descripcion,icono,orden,estado,usuario_abm) VALUES ('Sistema','Estructura','fas fa-cog',2,1,'admin');
 
 
 /**
@@ -71,7 +72,9 @@ CREATE TABLE grupos_opciones (
 );
 
 -- Asignar Permisos de Grupos a Opciones (Menús)
-INSERT INTO grupos_opciones (grupo_id, opcion_id, usuario_abm) VALUES (1, 1, 'admin');
+
+INSERT INTO grupos_opciones (grupo_id, opcion_id, usuario_abm) VALUES (1, 1, 'admin'); --adminstracion
+INSERT INTO grupos_opciones (grupo_id, opcion_id, usuario_abm) VALUES (1, 2, 'admin'); --estructura
 
 /**
  * Grupos - Items (Permisos de Grupos a Submenús)

@@ -18,74 +18,53 @@ if (function_exists($function)) {
 
 function editar($con)
 {
+
     // Sanitización y verificación de los datos recibidos por POST
     $id = (int) ($_POST['id'] ?? 0);
     $nombre = mysqli_real_escape_string($con, $_POST['nombre'] ?? '');
     $provincia_id = (int) ($_POST['provincia_id'] ?? 0); // Asegurar que sea int y no null
     $codigo_postal = mysqli_real_escape_string($con, $_POST['codigo_postal'] ?? '');
-    $observaciones = mysqli_real_escape_string($con, $_POST['observaciones'] ?? '');
 
 
-    // Validar que los IDs de claves foráneas sean válidos antes de la transacción
-    // Verificar si provincia_id existe en la tabla provincias
-    $sql_check_provincia = "SELECT COUNT(*) FROM provincias WHERE id = $provincia_id";
-    $res_check_provincia = mysqli_query($con, $sql_check_provincia);
-    $row_check_provincia = mysqli_fetch_array($res_check_provincia);
-    if ($row_check_provincia[0] == 0 && $provincia_id != 0) { // Permitir 0 si no es NOT NULL en DB
-        echo '
-        <div class="alert alert-danger" role="alert">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <i class="fas fa-exclamation-triangle"></i> Error: La Provincia seleccionada no es válida.
-        </div>';
-        return;
-    }
-
-
-    // --- INICIO DE TRANSACCIÓN ---
-    mysqli_begin_transaction($con);
-
-    try {
-        if ($id > 0) {
-            // Update usando prepared statement para localidades
-            $stmt = mysqli_prepare($con, "UPDATE localidades SET nombre = ?, provincia_id = ?, codigo_postal = ?, observaciones = ? WHERE id = ?");
-            if (!$stmt) {
-                throw new Exception("Error al preparar la consulta de actualización: " . mysqli_error($con));
-            }
-            mysqli_stmt_bind_param($stmt, "sisss", $nombre, $provincia_id, $codigo_postal, $observaciones, $id);
-            $mensaje = "El registro se modificó con éxito";
-        } else {
-            // Insert usando prepared statement para localidades
-            $stmt = mysqli_prepare($con, "INSERT INTO localidades (nombre, provincia_id, codigo_postal, observaciones) VALUES (?, ?, ?, ?)");
-            if (!$stmt) {
-                throw new Exception("Error al preparar la consulta de inserción: " . mysqli_error($con));
-            }
-            mysqli_stmt_bind_param($stmt, "siss", $nombre, $provincia_id, $codigo_postal, $observaciones);
-            $mensaje = "El registro se creó con éxito";
-        }
-
-        if (mysqli_stmt_execute($stmt)) {
-            mysqli_commit($con); // Confirmar transacción
-            echo '<div class="alert alert-primary animated--grow-in" role="alert">
+    if($id == 0){
+        // Si el ID es 0, significa que estamos insertando un nuevo registro
+        $sql = "INSERT INTO localidades (nombre, provincia_id, codigo_postal) VALUES ('$nombre', $provincia_id, '$codigo_postal')";
+        $con->query($sql);
+        if ($con->error) {
+            echo '<div class="alert alert-danger" role="alert">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <i class="far fa-check-circle"></i> ' . $mensaje . '
+            <i class="fas fa-exclamation-triangle"></i> Error al crear el registro: ' . $con->error . '
             </div>';
+            return;
+        }
+        // $id = $con->insert_id; // Obtener el ID del último registro insertado
+    } else {
+        // update la localidad
+        $sql = "UPDATE localidades SET nombre = '$nombre', provincia_id = $provincia_id, codigo_postal = '$codigo_postal' WHERE id = $id";
+        $con->query($sql);
+        
+        // Si la inserción fue exitosa, mostrar mensaje de éxito
+        if ($con->error) {
+            echo '<div class="alert alert-danger" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="fas fa-exclamation-triangle"></i> Error al actualizar el registro: ' . $con->error . '
+            </div>';
+            return;
+        }else{
+
+            // Si la actualización fue exitosa, mostrar mensaje de éxito
+            echo '<div class="alert alert-primary" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <i class="far fa-check-circle"></i> El registro se modifico con éxito
+            </div>';
+           
+            // Mensaje de éxito
             echo "<script>listado();</script>";
             echo "<script>cerrar_formulario();</script>";
-        } else {
-            // Si la ejecución falla, lanzar excepción para que el catch la maneje
-            throw new Exception("Error al ejecutar la consulta: " . mysqli_stmt_error($stmt));
+            return;
         }
-
-        mysqli_stmt_close($stmt);
-
-    } catch (Exception $e) {
-        mysqli_rollback($con); // Revertir transacción si hay error
-        echo '
-        <div class="alert alert-danger" role="alert">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <i class="fas fa-exclamation-triangle"></i> ' . $e->getMessage() . '
-        </div>';
     }
+
 }
 
 

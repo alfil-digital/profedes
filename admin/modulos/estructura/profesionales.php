@@ -1,8 +1,8 @@
-<script type="text/javascript" src="modulos/administracion/entidades/funciones.js"></script>
+<script type="text/javascript" src="modulos/estructura/profesionales/funciones.js"></script>
 
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-  <h1 class="h3 mb-0 text-gray-800">Entidades</h1>                        
+  <h1 class="h3 mb-0 text-gray-800">Profesionales</h1>                        
 </div>
 
 <div id="menu" class="form-group" align="left">

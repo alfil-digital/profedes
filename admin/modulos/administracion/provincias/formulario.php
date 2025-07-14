@@ -51,11 +51,6 @@ if ($_GET['id'] != 0) {
       value="<?php if ($_GET['id'] != 0) echo $row['created_at']; ?>" readonly>
   </div>
 
-  <div class="col-md-12 position-relative">
-    <label for="observaciones" class="form-label">Observaciones</label>
-    <textarea class="form-control" id="observaciones" name="observaciones" rows="3"><?php if ($_GET['id'] != 0 && isset($row['observaciones'])) echo $row['observaciones']; ?></textarea>
-  </div>
-
 </form>
 <div class="mt-4" align="center">
   <button type="submit" class="btn btn-primary" onclick="guardar()">Guardar</button>
