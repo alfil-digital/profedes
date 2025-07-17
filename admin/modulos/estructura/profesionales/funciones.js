@@ -212,3 +212,14 @@ function verificarMatricula(t) {
   //   }
   // });
 }
+
+function generar_matricula(){
+  // genero el post para generar la matricula
+  $.post("modulos/estructura/profesionales/controlador.php?f=generar_matricula",function (dato) {
+    $("#mensaje").css('display', 'block');
+    $("#mensaje").html(dato);
+    $('#mensaje').fadeIn('slow');
+    listado();
+    cerrar_formulario();
+  });
+}

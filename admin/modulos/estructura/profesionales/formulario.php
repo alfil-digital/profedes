@@ -50,6 +50,16 @@ $titulos = $con->query($sql);
     </select>
   </div>
 
+
+  <div class="col-md-4 position-relative">
+    <label for="cuit" class="form-label">cuit <?php if ($_GET['id'] != 0) echo "[" . $row['cuit'] . "]"; ?></label>
+    <input type="text" class="form-control" id="cuit" name="cuit" placeholder="cuit"
+      value="<?php if ($_GET['id'] != 0) echo $row['cuit']; ?>">
+    <div class="invalid-feedback">
+      Ingrese el cuit
+    </div>
+  </div>
+
   <!-- titulo -->
   <div class="col-md-4 position-relative">
     <label for=""> Titulo</label>
@@ -71,33 +81,25 @@ $titulos = $con->query($sql);
   </div>
 
 
-
-  <!-- matricula -->
   <div class="col-md-4 position-relative">
+    <label for="observaciones" class="form-label">Observaciones</label>
+    <textarea class="form-control" id="observaciones" name="observaciones" rows="3"><?php if ($_GET['id'] != 0) echo $row['observaciones']; ?></textarea>
+  </div>
+
+
+    <!-- matricula -->
+    <div class="col-md-4 position-relative">
     <label for="matricula" class="form-label">matricula <?php if ($_GET['id'] != 0) echo "[" . $row['matricula'] . "]"; ?></label>
-    <input type="text" class="form-control" onblur="verificarMatricula(this)" id="matricula" name="matricula" placeholder="matricula"
+
+    <div>
+      <a href="#" onclick="generar_matricula()"> Generar Matricula </a>
+    </div>
+    <!-- <input type="text" class="form-control" onblur="verificarMatricula(this)" id="matricula" name="matricula" placeholder="matricula"
       value="<?php if ($_GET['id'] != 0) echo $row['matricula']; ?>">
       <div class="invalid-feedback" id="mensaje_matricula"></div>
     <div class="invalid-feedback">
       Ingrese el matricula
-    </div>
-  </div>
-
-  <div class="col-md-4 position-relative">
-    <label for="cuit" class="form-label">cuit <?php if ($_GET['id'] != 0) echo "[" . $row['cuit'] . "]"; ?></label>
-    <input type="text" class="form-control" id="cuit" name="cuit" placeholder="cuit"
-      value="<?php if ($_GET['id'] != 0) echo $row['cuit']; ?>">
-    <div class="invalid-feedback">
-      Ingrese el cuit
-    </div>
-  </div>
-
-
-
-
-  <div class="col-md-4 position-relative">
-    <label for="observaciones" class="form-label">Observaciones</label>
-    <textarea class="form-control" id="observaciones" name="observaciones" rows="3"><?php if ($_GET['id'] != 0) echo $row['observaciones']; ?></textarea>
+    </div> -->
   </div>
 
 </form>

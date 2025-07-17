@@ -118,3 +118,36 @@ function eliminar($con) {
     </div>';
   }
 }
+
+// creo la funcion para crear una matricula nueva
+function generar_matricula($con) {
+  
+
+  
+    $sql = "INSERT INTO profesionales (
+              persona_id,
+              cuit,
+              matricula_id
+            ) VALUES (
+              $persona_id,
+              '$cuit',
+              $matricula_id
+            )";
+    $mensaje = "El registro se creó con éxito";
+
+  if (mysqli_query($con, $sql)) {
+    echo '
+    <div class="alert alert-primary animated--grow-in" role="alert">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <i class="far fa-check-circle"></i> ' . $mensaje . '
+    </div>';
+    echo "<script>listado();</script>";
+    echo "<script>cerrar_formulario();</script>";
+  } else {
+    echo '
+    <div class="alert alert-danger" role="alert">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <i class="fas fa-exclamation-triangle"></i> No se pudo crear el registro
+    </div>';
+  }
+}
